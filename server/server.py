@@ -255,7 +255,7 @@ def waitOnRequest(ser):
 	if not line:
 		#timeout
 		curr_mode = ser_states['WAIT_ON_REQ']
-		print("timeout on request")
+		print("No Request from Client")
 		return
 	line_string = line.decode("ASCII")
 	#print("This is the actual string:", line_string)
@@ -267,14 +267,12 @@ def waitOnRequest(ser):
 		#send acknowledge to server
 		sendAck(ser)
 		curr_mode = ser_states['WAIT_ON_ACK']
-		print(curr_mode)
 	else:
 		curr_mode = ser_states['WAIT_ON_REQ']
 
 
 def waitOnAck(ser):
 	global curr_mode
-	print("waiting on ack")
 	line = ser.readline()
 	if not line:
 		#timeout
@@ -353,11 +351,6 @@ def writeToArduino(out_line,ser):
 
 
 
-
-
-
-
-
 if __name__ == "__main__":
 	# first load the edmonton graph
 	edmonton_graph, location = server.load_edmonton_graph("edmonton-roads-2.0.1.txt")
@@ -383,6 +376,7 @@ if __name__ == "__main__":
 				start = findpath(int(startLat),int(startLon),location)
 				end = findpath(int(endLat),int(endLon),location)
 				path = server.least_cost_path(edmonton_graph,start,end,cost)
+				print(path)
 				writeToClient(path,ser)
 
 

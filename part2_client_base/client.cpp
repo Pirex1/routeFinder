@@ -100,33 +100,32 @@ void process_input() {
 //all must have timout funcationaltiy
 
 void wait_for_ack(){
-
+  
   int time = millis();
   while(time < 5000){
 
 
-    if(Serial.available() != 0){
+    if(Serial.available() > 0){
 
       char in_byte = Serial.read();
 
       if(in_byte == 'A'){
         curr_mode = SEND_DATA;
-        Serial.write('A');
-        // break;
+        Serial.write("A");
+        Serial.write("\n");
+        Serial.flush();
+        break;
 
       }
       else{
 
         curr_mode = SEND_REQ;
-        // break;
 
       }
 
     }
 
   }
-
-  curr_mode = SEND_REQ;
   
 }
 
@@ -201,6 +200,7 @@ bool receive_data(){
 }
 
 void send_data(lon_lat_32 start, lon_lat_32 end){;
+  
   String out_string = String(start.lat) + " " + String(start.lon) +" " + String(end.lat) + " " + String(end.lon) + "\r\n"; 
     
   for(int i = 0; i<out_string.length(); ++i){
@@ -270,6 +270,8 @@ int main() {
         while(!dataReceived){
             if(curr_mode == SEND_REQ){
               Serial.write("R");
+              Serial.write("\n");
+              Serial.flush();
               curr_mode = WAIT_FOR_ACK;
             }
             else if(curr_mode == WAIT_FOR_ACK){
