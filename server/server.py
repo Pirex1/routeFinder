@@ -317,14 +317,13 @@ def recieveFromClient(ser):
 	stripped = line_string.rstrip("\r\n")
 	print("I read line from recieveFromClient: ", stripped)
 	curr_mode = ser_states['PROCESS']
-	stripped.split()
-	return stripped[1],stripped[2],stripped[3],stripped[4]
+	stripped = stripped.split(' ')
+	return stripped[0],stripped[1],stripped[2],stripped[3]
+
 
 def writeToClient(path,ser):
 	# construct the line you want to print to the
 	# Arduino, don't forget the newline
-
-	sleep(5)#give time to process totaling 10 seconds
 
 	'''need to give the server:
 	1. # of nodes
@@ -332,21 +331,25 @@ def writeToClient(path,ser):
 	3. # end confirmation
 	'''
 	#node number
+	global curr_mode
 	length = str(len(path))
-	out_line = "N" +  length +  "\n"#arduino will take this as no path if length > 500
+	out_line = "N" + " " + length +  "\n"#arduino will take this as no path if length > 500
+	print(out_line)
 	writeToArduino(out_line,ser)
 
 	for i in range(len(path)):
 
-		out_line = "W" + str(location[path[i]]) + "\n"
+		out_line = "W" + " " + str(location[path[i]][0]) + " " + str(location[path[i]][1]) + " " + "\n"
+		print(out_line)
 		writeToArduino(out_line,ser)
 
 	out_line = "E"
 	writeToArduino(out_line,ser)
-
+	curr_mode = WAIT_ON_REQ
 
 def writeToArduino(out_line,ser):
 	encoded = out_line.encode("ASCII")
+	print(out_line)
 	ser.write(encoded)
 
 
@@ -364,7 +367,7 @@ if __name__ == "__main__":
 		4.pass coords to client
 	'''
 	
-	with Serial("/dev/ttyACM0", baudrate=9600, timeout=5) as ser:
+	with Serial("/dev/ttyACM0", baudrate=9600, timeout=15) as ser:
 		while True:
 			if curr_mode == 'WAIT_ON_REQ':
 				waitOnRequest(ser)
@@ -376,7 +379,6 @@ if __name__ == "__main__":
 				start = findpath(int(startLat),int(startLon),location)
 				end = findpath(int(endLat),int(endLon),location)
 				path = server.least_cost_path(edmonton_graph,start,end,cost)
-				print(path)
 				writeToClient(path,ser)
 
 

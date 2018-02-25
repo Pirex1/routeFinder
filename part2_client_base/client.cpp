@@ -137,7 +137,7 @@ bool receive_data(){
 
   int waypoint_number = 0;
 
-  while(time < 10000){
+  while(time < 5000){
     if(Serial.available() != 0){
       time = 0;
       time = millis();
